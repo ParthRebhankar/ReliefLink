@@ -4,17 +4,21 @@ import HeroTelemetry from './components/HeroTelemetry';
 import TelemetryCharts from './components/TelemetryCharts';
 import ZoneExplorer from './components/ZoneExplorer';
 import ReadingsTable from './components/ReadingsTable';
+import EmergencyRequestsView from './components/EmergencyRequestsView';
+import ReliefInventoryView from './components/ReliefInventoryView';
+import VolunteersTeamsView from './components/VolunteersTeamsView';
+import ReliefIntelligenceView from './components/ReliefIntelligenceView';
 // Three.js is heavy (~800 kB) and only needed on the Flood Map tab, so load it on demand.
 const NagpurMap = lazy(() => import('./components/NagpurMap'));
 import DeviceConnectModal from './components/DeviceConnectModal';
 import SimulatorModal from './components/SimulatorModal';
+import SOSSimulatorModal from './components/SOSSimulatorModal';
 import SettingsModal from './components/SettingsModal';
 import CriticalAlertPopup from './components/CriticalAlertPopup';
 import LandingPage from './components/LandingPage';
 import { fetchHealth, fetchZones, fetchLatestReading, fetchReadingHistory, getBaseUrl } from './api/client';
-import { isNotificationSupported, getNotificationPermission, requestNotificationPermission, sendCriticalPushNotification } from './utils/notifications';
+import { getNotificationPermission, requestNotificationPermission, sendCriticalPushNotification } from './utils/notifications';
 import { startContinuousBuzzer, stopContinuousBuzzer, setBuzzerMuted } from './utils/buzzer';
-import { AlertTriangle, Activity } from 'lucide-react';
 
 export default function App() {
   const [backendOnline, setBackendOnline] = useState(false);
@@ -56,6 +60,7 @@ export default function App() {
   // Modals
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [showSimulatorModal, setShowSimulatorModal] = useState(false);
+  const [showSOSModal, setShowSOSModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   // Initial Load: Zones and Health
@@ -196,6 +201,7 @@ export default function App() {
         onRefresh={() => loadTelemetry(true)}
         isRefreshing={isRefreshing}
         onOpenSimulator={() => setShowSimulatorModal(true)}
+        onOpenSOSModal={() => setShowSOSModal(true)}
         onOpenConnectModal={() => setShowConnectModal(true)}
         onOpenSettingsModal={() => setShowSettingsModal(true)}
         activeTab={activeTab}
@@ -220,6 +226,33 @@ export default function App() {
             {/* Ingestion Data Log Table */}
             <ReadingsTable history={history} selectedZone={selectedZone} />
           </div>
+        ) : activeTab === 'requests' ? (
+          /* Emergency Requests and SOS Module */
+          <EmergencyRequestsView
+            selectedZone={selectedZone}
+            zones={zones}
+            onSelectZone={(z) => {
+              setSelectedZone(z);
+              setActiveTab('live');
+            }}
+          />
+        ) : activeTab === 'inventory' ? (
+          /* Relief Inventory & Stock Management Module */
+          <ReliefInventoryView
+            onNavigateToRequests={() => setActiveTab('requests')}
+          />
+        ) : activeTab === 'teams' ? (
+          /* Response Teams & Volunteer Coordination Module */
+          <VolunteersTeamsView
+            onNavigateToRequests={() => setActiveTab('requests')}
+          />
+        ) : activeTab === 'intelligence' ? (
+          /* Phase 4: Relief Intelligence & Smart Prioritization */
+          <ReliefIntelligenceView
+            onNavigateToRequests={() => setActiveTab('requests')}
+            onNavigateToInventory={() => setActiveTab('inventory')}
+            onNavigateToTeams={() => setActiveTab('teams')}
+          />
         ) : activeTab === 'map' ? (
           /* Nagpur Flood Map (2D / 3D) */
           <Suspense fallback={<div className="glass-card map-loading-state" style={{ height: '560px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Loading map engine...</div>}>
@@ -278,6 +311,19 @@ export default function App() {
             }
           }
           loadTelemetry(false);
+        }}
+      />
+
+      <SOSSimulatorModal
+        isOpen={showSOSModal}
+        onClose={() => setShowSOSModal(false)}
+        selectedZone={selectedZone}
+        zones={zones}
+        onRequestCreated={() => {
+          // If created, can stay or switch
+        }}
+        onNavigateToRequests={() => {
+          setActiveTab('requests');
         }}
       />
 

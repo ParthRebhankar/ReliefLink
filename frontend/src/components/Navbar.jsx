@@ -12,7 +12,12 @@ import {
   Sliders,
   Cpu,
   RefreshCw,
-  Settings
+  Settings,
+  LifeBuoy,
+  Radio,
+  Package,
+  Users,
+  Brain
 } from 'lucide-react';
 
 export default function Navbar({
@@ -23,6 +28,7 @@ export default function Navbar({
   onRefresh,
   isRefreshing,
   onOpenSimulator,
+  onOpenSOSModal,
   onOpenConnectModal,
   onOpenSettingsModal,
   activeTab,
@@ -34,54 +40,27 @@ export default function Navbar({
   onShowLanding
 }) {
   return (
-    <header className="dashboard-nav" style={{
-      background: 'var(--bg-surface-glass)',
-      backdropFilter: 'blur(24px) saturate(140%)',
-      borderBottom: '1px solid var(--border-subtle)',
-      position: 'sticky',
-      top: 0,
-      zIndex: 40,
-      padding: 'var(--space-lg) var(--space-xl)',
-      transition: 'all 0.3s ease'
-    }}>
-      <div className="dashboard-nav__inner" style={{
-        maxWidth: '1440px',
-        margin: '0 auto',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: 'var(--space-lg)'
-      }}>
-        {/* Brand - Cleaner, more minimal */}
-        <div className="dashboard-brand" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+    <header className="dashboard-nav">
+      <div className="dashboard-nav__inner">
+        {/* Brand */}
+        <div className="dashboard-brand">
           <button
             onClick={onShowLanding}
             className="dashboard-brand__mark"
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--text-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: 'none',
-              cursor: onShowLanding ? 'pointer' : 'default'
-            }}
             title={onShowLanding ? 'Back to landing' : undefined}
             aria-label="Back to landing"
           >
-            <ShieldAlert size={20} color="var(--bg-primary)" strokeWidth={2.5} />
+            <ShieldAlert size={18} strokeWidth={2.4} />
           </button>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <h1 style={{
-                fontSize: '1.125rem',
-                fontWeight: 600,
+                fontSize: '1rem',
+                fontWeight: 700,
                 color: 'var(--text-primary)',
-                letterSpacing: '0',
-                marginBottom: '2px'
+                letterSpacing: '-0.01em',
+                lineHeight: 1.1,
+                margin: 0
               }}>
                 FloodGuard
               </h1>
@@ -89,87 +68,93 @@ export default function Navbar({
                 <button
                   onClick={onShowLanding}
                   style={{
-                    fontSize: '0.65rem',
+                    fontSize: '0.625rem',
                     fontWeight: 600,
-                    letterSpacing: '0.04em',
+                    letterSpacing: '0.03em',
                     textTransform: 'uppercase',
                     color: 'var(--text-muted)',
                     background: 'var(--bg-surface-elevated)',
                     border: '1px solid var(--border-subtle)',
                     borderRadius: '999px',
-                    padding: '3px 8px',
-                    cursor: 'pointer'
+                    padding: '1px 6px',
+                    cursor: 'pointer',
+                    lineHeight: 1.4
                   }}
                 >
                   Landing
                 </button>
               )}
             </div>
-            <p style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', letterSpacing: '0.02em' }}>
+            <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1 }}>
               Nagpur Smart Drainage
             </p>
           </div>
         </div>
 
-        {/* Navigation - More spacious */}
-        <div className="dashboard-tabs" style={{
-          display: 'flex',
-          background: 'var(--bg-surface-elevated)',
-          padding: '4px',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border-subtle)',
-          gap: '4px'
-        }}>
+        {/* Navigation Tabs */}
+        <nav className="dashboard-tabs" aria-label="Main navigation">
           <NavTab
             active={activeTab === 'live'}
             onClick={() => setActiveTab('live')}
-            icon={<Activity size={14} />}
+            icon={<Activity size={13} />}
             label="Live"
+          />
+          <NavTab
+            active={activeTab === 'requests'}
+            onClick={() => setActiveTab('requests')}
+            icon={<LifeBuoy size={13} />}
+            label="SOS & Requests"
+          />
+          <NavTab
+            active={activeTab === 'inventory'}
+            onClick={() => setActiveTab('inventory')}
+            icon={<Package size={13} />}
+            label="Inventory"
+          />
+          <NavTab
+            active={activeTab === 'teams'}
+            onClick={() => setActiveTab('teams')}
+            icon={<Users size={13} />}
+            label="Teams"
+          />
+          <NavTab
+            active={activeTab === 'intelligence'}
+            onClick={() => setActiveTab('intelligence')}
+            icon={<Brain size={13} />}
+            label="Intelligence"
           />
           <NavTab
             active={activeTab === 'zones'}
             onClick={() => setActiveTab('zones')}
-            icon={<MapPin size={14} />}
+            icon={<MapPin size={13} />}
             label={`Zones (${zones ? zones.length : 0})`}
           />
           <NavTab
             active={activeTab === 'map'}
             onClick={() => setActiveTab('map')}
-            icon={<Map size={14} />}
+            icon={<Map size={13} />}
             label="Map"
           />
-        </div>
+        </nav>
 
-        {/* Controls - Cleaner layout */}
-        <div className="dashboard-controls" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', flexWrap: 'wrap' }}>
-          {/* Status indicator - minimal */}
-          <div className="backend-status" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-sm)',
-            padding: '6px 14px',
-            background: backendOnline ? 'var(--status-safe-bg)' : 'var(--status-critical-bg)',
-            border: `1px solid ${backendOnline ? 'var(--status-safe)' : 'var(--status-critical)'}`,
-            borderRadius: 'var(--radius-full)',
-            fontSize: '0.6875rem',
-            fontWeight: 600,
-            color: backendOnline ? 'var(--status-safe)' : 'var(--status-critical)'
-          }}>
+        {/* Controls */}
+        <div className="dashboard-controls">
+          {/* Status indicator */}
+          <div
+            className="backend-status"
+            style={{
+              background: backendOnline ? 'var(--status-safe-bg)' : 'var(--status-critical-bg)',
+              border: `1px solid ${backendOnline ? 'var(--status-safe)' : 'var(--status-critical)'}`,
+              color: backendOnline ? 'var(--status-safe)' : 'var(--status-critical)'
+            }}
+          >
             <span className={`live-indicator ${backendOnline ? 'online' : 'offline'}`}></span>
             {backendOnline ? 'Online' : 'Offline'}
           </div>
 
           {/* Zone selector */}
-          <div className="zone-switcher" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-sm)',
-            background: 'var(--bg-surface-elevated)',
-            border: '1px solid var(--border-medium)',
-            borderRadius: 'var(--radius-md)',
-            padding: '6px 12px'
-          }}>
-            <MapPin size={13} color="var(--text-secondary)" />
+          <div className="zone-switcher">
+            <MapPin size={12} color="var(--text-secondary)" />
             <select
               value={selectedZone}
               onChange={(e) => onSelectZone(e.target.value)}
@@ -177,8 +162,6 @@ export default function Navbar({
                 background: 'transparent',
                 border: 'none',
                 color: 'var(--text-primary)',
-                fontSize: '0.8125rem',
-                fontWeight: 600,
                 outline: 'none',
                 cursor: 'pointer',
                 fontFamily: 'var(--font-mono)'
@@ -198,21 +181,35 @@ export default function Navbar({
 
           {/* Action buttons */}
           <button
+            onClick={onOpenSOSModal}
+            className="btn-primary"
+            style={{
+              background: 'var(--alarm)',
+              borderColor: 'var(--alarm)',
+              color: '#fff'
+            }}
+            title="Simulate incoming SOS beacon"
+          >
+            <Radio size={13} className="pulse-icon" />
+            <span>SOS</span>
+          </button>
+
+          <button
             onClick={onOpenSimulator}
             className="btn-secondary"
-            title="Simulate readings"
+            title="Simulate telemetry readings"
           >
-            <Sliders size={14} />
-            Simulate
+            <Sliders size={13} />
+            <span>Simulate</span>
           </button>
 
           <button
             onClick={onOpenConnectModal}
             className="btn-primary"
-            title="Connect ESP32"
+            title="Connect ESP32 device"
           >
-            <Cpu size={14} />
-            Connect
+            <Cpu size={13} />
+            <span>Connect</span>
           </button>
 
           {/* Icon buttons */}
@@ -232,16 +229,16 @@ export default function Navbar({
               'Enable notifications'
             }
           >
-            {notifPermission === 'granted' ? <BellRing size={15} /> :
-             notifPermission === 'denied' ? <BellOff size={15} /> :
-             <Bell size={15} />}
+            {notifPermission === 'granted' ? <BellRing size={14} /> :
+             notifPermission === 'denied' ? <BellOff size={14} /> :
+             <Bell size={14} />}
             {notifPermission === 'granted' && (
               <span style={{
                 position: 'absolute',
-                top: '8px',
-                right: '8px',
-                width: '5px',
-                height: '5px',
+                top: '6px',
+                right: '6px',
+                width: '4px',
+                height: '4px',
                 borderRadius: '50%',
                 background: 'var(--status-safe)'
               }} />
@@ -251,18 +248,18 @@ export default function Navbar({
           <button
             onClick={onToggleTheme}
             className="btn-icon"
-            title={theme === 'light' ? 'Switch to dark' : 'Switch to light'}
+            title={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
           >
-            {theme === 'light' ? <Moon size={15} /> : <Sun size={15} />}
+            {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
           </button>
 
           <button
             onClick={onRefresh}
             className="btn-icon"
-            title="Refresh"
+            title="Refresh telemetry"
           >
             <RefreshCw
-              size={15}
+              size={14}
               style={{
                 transform: isRefreshing ? 'rotate(360deg)' : 'none',
                 transition: isRefreshing ? 'transform 0.8s linear' : 'none'
@@ -273,9 +270,9 @@ export default function Navbar({
           <button
             onClick={onOpenSettingsModal}
             className="btn-icon"
-            title="Settings"
+            title="System Settings"
           >
-            <Settings size={15} />
+            <Settings size={14} />
           </button>
         </div>
       </div>
@@ -288,22 +285,10 @@ function NavTab({ active, onClick, icon, label }) {
     <button
       onClick={onClick}
       className={`nav-tab${active ? ' is-active' : ''}`}
-      style={{
-        padding: '8px 16px',
-        borderRadius: 'var(--radius-sm)',
-        fontSize: '0.8125rem',
-        fontWeight: 500,
-        color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-        background: active ? 'var(--bg-surface)' : 'transparent',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 'var(--space-sm)',
-        border: active ? '1px solid var(--border-medium)' : '1px solid transparent'
-      }}
       aria-current={active ? 'page' : undefined}
     >
       {icon}
-      {label}
+      <span>{label}</span>
     </button>
   );
 }
